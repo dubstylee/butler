@@ -33,10 +33,9 @@ def main():
 	mqtt_client.loop_start()
 
 	fork = Fork(sys.argv[1], led)
-	send_message("Fork %s running on led #%d" % (fork.name, fork.led_no))
 
 	while True:
-		print "I'm a fork named %s" % fork.name
+		send_message("Fork %s running on led #%d" % (fork.name, fork.led_no))
 		time.sleep(5.0)
 
 if __name__ == '__main__': main()

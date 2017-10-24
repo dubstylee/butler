@@ -17,7 +17,7 @@ s.close()
 broker = 'sansa.cs.uoregon.edu'
 mqtt_topic = 'cis650/somethingcool'
 mqtt_client = paho.Client()
-mqtt_client.connect(broker, '1883') 
+mqtt_client.connect(broker, '1883')
 mqtt_client.subscribe(mqtt_topic)
 
 
@@ -35,15 +35,15 @@ signal.signal(signal.SIGINT, control_c_handler)
 
 
 def on_connect(client, userdata, flags, rc):
-	print "connected"
+	print("connected")
 
 
 def on_disconnect(client, userdata, rc):
-	print "disconnected in a normal way"
+	print("disconnected in a normal way")
 
 
 def on_log(client, userdata, level, buf):
-	print "log: {}".format(buf)
+	print("log: {}".format(buf))
 
 
 def send_message(message):
