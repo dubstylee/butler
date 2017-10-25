@@ -1,6 +1,5 @@
 import Tkinter as tk
-import time
-from shared import *
+from shared import mqtt_client, mqtt_topic, send_message, ON, OFF
 
 
 leds = []
@@ -37,17 +36,17 @@ class Circle:
 class Ledison(tk.Frame):
     def draw_circle(self, c):
         return self.draw_circle_internal(c.x, c.y, c.r, fill=c.fill,
-            outline=c.outline, width=c.width)
+                                         outline=c.outline, width=c.width)
 
     def draw_circle_internal(self, x, y, r, **kwargs):
-        return self.canvas.create_oval(x-r, y-r, x+r, y+r, **kwargs)
+        return self.canvas.create_oval(x - r, y - r, x + r, y + r, **kwargs)
 
     def __init__(self, master):
         tk.Frame.__init__(self, master)
         master.title("LEDison")
         self.master = master
         self.canvas = tk.Canvas(master, width=360, height=80, borderwidth=0,
-            highlightthickness=0, bg="#DDD")
+                                highlightthickness=0, bg="#DDD")
         self.canvas.grid()
         self._job = None
 
@@ -64,7 +63,7 @@ def on_message(client, userdata, msg):
         else:
             leds[led_no].write(ON)
 
-#def ledison_loop(gui):
+# def ledison_loop(gui):
 #    for i in range(0,3):
 #        for led in gui.leds:
 #            led.write(0)
@@ -89,20 +88,22 @@ def main():
 
     root = tk.Tk()
     gui = Ledison(root)
-    for i in range(0,8):
-        c = Circle(gui, i, 40+40*i, 40, 15, fill="#BBB", outline="white", width=1)
-        if i in range(0,4):
+    for i in range(0, 8):
+        c = Circle(gui, i, 40 + 40 * i, 40, 15, fill="#BBB", outline="white",
+                   width=1)
+        if i in range(0, 4):
             c.on_color = "green"
-        elif i in range(4,7):
+        elif i in range(4, 7):
             c.on_color = "yellow"
         else:
             c.on_color = "red"
         leds.append(c)
         c.write(1)
 
-    #gui._job = root.after(500, ledison_loop, gui)
+    # gui._job = root.after(500, ledison_loop, gui)
     send_message("LEDison online")
     root.mainloop()
 
 
-if __name__ == "__main__": main()
+if __name__ == "__main__":
+    main()

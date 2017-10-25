@@ -1,12 +1,13 @@
-import time, socket, sys
+import time
+import socket
+import sys
 import paho.mqtt.client as paho
 import signal
-import Tkinter as tk
 from datetime import datetime as dt
 
 
 # for leds
-ON 	= 0
+ON = 0
 OFF = 1
 
 
@@ -54,3 +55,24 @@ signal.signal(signal.SIGINT, control_c_handler)
 mqtt_client.on_connect = on_connect
 mqtt_client.on_disconnect = on_disconnect
 #mqtt_client.on_log = on_log
+
+
+class Queue:
+	def __init__(self):
+		self.items = []
+
+	def is_empty(self):
+		return self.items == []
+
+	def put(self, item):
+		self.items.insert(0, item)
+
+	def put_distinct(self, item):
+		if item not in self.items:
+			self.items.insert(0, item)
+
+	def get(self):
+		return self.items.pop()
+
+	def count(self):
+		return len(self.items)
