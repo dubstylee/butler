@@ -1,12 +1,13 @@
 import time, socket, sys
 import paho.mqtt.client as paho
 import signal
+import Tkinter as tk
 from datetime import datetime as dt
 
 
 # for leds
 ON 	= 0
-OFF 	= 1
+OFF = 1
 
 
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -31,9 +32,6 @@ def control_c_handler(signum, frame):
 	exit_program()
 
 
-signal.signal(signal.SIGINT, control_c_handler)
-
-
 def on_connect(client, userdata, flags, rc):
 	print("connected")
 
@@ -50,6 +48,8 @@ def send_message(message):
 	timestamp = dt.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S.%f')
 	mqtt_client.publish(mqtt_topic, "[%s] %s %s" % (timestamp, ip_addr, message))
 
+
+signal.signal(signal.SIGINT, control_c_handler)
 
 mqtt_client.on_connect = on_connect
 mqtt_client.on_disconnect = on_disconnect

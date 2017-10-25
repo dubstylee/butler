@@ -35,8 +35,6 @@ class Circle:
 
 
 class Ledison(tk.Frame):
-    status = 0
-
     def draw_circle(self, c):
         return self.draw_circle_internal(c.x, c.y, c.r, fill=c.fill,
             outline=c.outline, width=c.width)
@@ -58,7 +56,6 @@ def on_message(client, userdata, msg):
     print (msg.payload)
 
     splits = msg.payload.split(' ')
-    print splits
 
     if splits[3] == "Fork":
         led_no = int(splits[8][1:])
