@@ -1,0 +1,23 @@
+Fork Philosopher interaction
+
+Request fork
+[timestamp] [ip] REQUEST <forkid> <philid>
+
+Response of fork
+[timestamp] [ip] FORKAVAIL <forkid> <philid>
+[timestamp] [ip] FORKBUSY <forkid> <philid>
+
+
+
+Philosopher Butler interaction
+
+Request sitdown
+[timestamp] [ip] SITDOWN <philid>
+
+Response from Butler
+[timestamp] [ip] GOSITDOWN <philid>
+[timestamp] [ip] NOSITDOWN <philid>
+
+Convey arise
+/*For this the butler does not need to ack*/
+[timestamp] [ip] ARISE <philid>
