@@ -7,6 +7,11 @@ Response of fork
 [timestamp] [ip] FORKAVAIL <forkid> <philid>
 [timestamp] [ip] FORKBUSY <forkid> <philid>
 
+Replace fork
+[timestamp] [ip] REPLACE <forkid> <philid>
+
+Response of fork
+[timestamp] [ip] FORKREPL <forkid>
 
 
 Philosopher Butler interaction
