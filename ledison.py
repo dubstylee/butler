@@ -1,5 +1,6 @@
 import Tkinter as tk
-from shared import mqtt_client, mqtt_topic, send_message, ON, OFF
+import sys
+from shared import exit_program, mqtt_client, mqtt_topic, send_message, ON, OFF
 
 
 leds = []
@@ -33,6 +34,13 @@ class Circle:
         self.gui.update()
 
 
+class Fluent():
+    id = 0
+
+
+fluent = Fluent()
+
+
 class Ledison(tk.Frame):
     def draw_circle(self, c):
         return self.draw_circle_internal(c.x, c.y, c.r, fill=c.fill,
@@ -56,33 +64,22 @@ def on_message(client, userdata, msg):
 
     splits = msg.payload.split(' ')
 
-    if splits[3] == "Fork":
-        led_no = int(splits[8][1:])
-        if leds[led_no].status == ON:
-            leds[led_no].write(OFF)
-        else:
-            leds[led_no].write(ON)
-
-# def ledison_loop(gui):
-#    for i in range(0,3):
-#        for led in gui.leds:
-#            led.write(0)
-#        time.sleep(0.1)
-#        for led in gui.leds:
-#            led.write(1)
-#        time.sleep(0.1)
-#    time.sleep(1.0)
-
-#    for led in gui.leds:
-#        led.write(0)
-#        time.sleep(0.1)
-#        led.write(1)
-
-#    gui._job = gui.after(500, ledison_loop, gui)
+    if splits[3] == "GOSITDOWN":
+        if int(splits[4]) == fluent.id:
+            leds[fluent.id].write(ON)
+    elif splits[3] == "ARISE":
+        if int(splits[4]) == fluent.id:
+            leds[fluent.id].write(OFF)
 
 
 def main():
-    mqtt_client.will_set(mqtt_topic, '___Will of LEDison___', 0, False)
+    if len(sys.argv) != 2:
+        print("Usage: fluent <led_no>")
+        exit_program()
+
+    fluent.id = int(sys.argv[1])
+    mqtt_client.will_set(mqtt_topic, '___Will of FLUENT %d___' % fluent.id, 0,
+                         False)
     mqtt_client.on_message = on_message
     mqtt_client.loop_start()
 
@@ -98,11 +95,11 @@ def main():
         else:
             c.on_color = "red"
         leds.append(c)
-        c.write(1)
+        c.write(OFF)
 
-    # gui._job = root.after(500, ledison_loop, gui)
-    send_message("LEDison online")
+    send_message("<LEDison> FLUENT %d is ready to rock" % fluent.id)
     root.mainloop()
+    exit_program()
 
 
 if __name__ == "__main__":

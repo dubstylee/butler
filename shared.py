@@ -24,55 +24,56 @@ mqtt_client.subscribe(mqtt_topic)
 
 
 def exit_program():
-	mqtt_client.disconnect()
-	mqtt_client.loop_stop()
-	sys.exit(0)
+    mqtt_client.disconnect()
+    mqtt_client.loop_stop()
+    sys.exit(0)
 
 
 def control_c_handler(signum, frame):
-	exit_program()
+    exit_program()
 
 
 def on_connect(client, userdata, flags, rc):
-	print("connected")
+    print("connected")
 
 
 def on_disconnect(client, userdata, rc):
-	print("disconnected in a normal way")
+    print("disconnected in a normal way")
 
 
 def on_log(client, userdata, level, buf):
-	print("log: {}".format(buf))
+    print("log: {}".format(buf))
 
 
 def send_message(message):
-	timestamp = dt.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S.%f')
-	mqtt_client.publish(mqtt_topic, "[%s] %s %s" % (timestamp, ip_addr, message))
+    timestamp = dt.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S.%f')
+    mqtt_client.publish(mqtt_topic, "[%s] %s %s" %
+                        (timestamp, ip_addr, message))
 
 
 signal.signal(signal.SIGINT, control_c_handler)
 
 mqtt_client.on_connect = on_connect
 mqtt_client.on_disconnect = on_disconnect
-#mqtt_client.on_log = on_log
+# mqtt_client.on_log = on_log
 
 
 class Queue:
-	def __init__(self):
-		self.items = []
+    def __init__(self):
+        self.items = []
 
-	def is_empty(self):
-		return self.items == []
+    def is_empty(self):
+        return self.items == []
 
-	def put(self, item):
-		self.items.insert(0, item)
+    def put(self, item):
+        self.items.insert(0, item)
 
-	def put_distinct(self, item):
-		if item not in self.items:
-			self.items.insert(0, item)
+    def put_distinct(self, item):
+        if item not in self.items:
+            self.items.insert(0, item)
 
-	def get(self):
-		return self.items.pop()
+    def get(self):
+        return self.items.pop()
 
-	def count(self):
-		return len(self.items)
+    def count(self):
+        return len(self.items)

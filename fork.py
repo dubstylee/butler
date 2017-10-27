@@ -1,41 +1,59 @@
 import time
+import sys
+from shared import exit_program, mqtt_client, mqtt_topic, send_message
 
-from shared import *
 
 class Fork():
-	name = "fork"
-	led_no = 0
+    name = "fork"
+    led_no = 0
+    in_use = False
 
-	def __init__(self, name, led_no):
-		self.name = name
-		self.led_no = led_no
+
+fork = Fork()
+
 
 def on_message(client, userdata, msg):
-	# we only listen for messages from CONTROL
-	print msg.payload
+    # we only listen for messages from
+    print msg.payload
+    splits = msg.payload.split(' ')
+    if splits[3] == "REQUEST":
+        if splits[4] == fork.name:
+            if fork.in_use:
+                send_message("FORKBUSY %s %d" % (fork.name, int(splits[5])))
+            else:
+                send_message("FORKAVAIL %s %d" % (fork.name, int(splits[5])))
+                fork.in_use = True
+    elif splits[3] == "REPLACE":
+        if splits[4] == fork.name:
+            send_message("FORKREPL %s" % fork.name)
+            fork.in_use = False
+
 
 def main():
-	if len(sys.argv) != 3:
-		print "Usage: fork <name> <led_no>"
-		exit_program()
+    if len(sys.argv) != 2:
+        print "Usage: fork <label>"
+        exit_program()
 
-	if not sys.argv[2].isdigit():
-		print "Usage: fork <name> <led_no>\nled_no must be a number between 0 and 7"
-		exit_program()
+    led = int(ord(sys.argv[1].lower()) - ord('a'))
+    if led < 0 or led > 7:
+        print "Usage: fork <label>\nlabel must be a letter between a and h"
+        exit_program()
 
-	led = int(sys.argv[2])
-	if led < 0 or led > 7:
-		print "Usage: fork <name> <led_no>\nled_no must be a number between 0 and 7"
-		exit_program()
+    mqtt_client.will_set(mqtt_topic, '___Will of FORK %s___' % fork.name, 0,
+                         False)
+    mqtt_client.on_message = on_message
+    mqtt_client.loop_start()
 
-	mqtt_client.will_set(mqtt_topic, '___Will of FORK___', 0, False)
-	mqtt_client.on_message = on_message
-	mqtt_client.loop_start()
+    fork.name = sys.argv[1]
+    fork.led_no = led
 
-	fork = Fork(sys.argv[1], led)
+    send_message("FORK '%s' is in da house (on led %d)" % (fork.name,
+                 fork.led_no))
 
-	while True:
-		send_message("Fork %s running on led #%d" % (fork.name, fork.led_no))
-		time.sleep(5.0)
+    while True:
+        # send_message("FORK %s stayin' alive" % fork.name)
+        time.sleep(5.0)
 
-if __name__ == '__main__': main()
+
+if __name__ == '__main__':
+    main()
