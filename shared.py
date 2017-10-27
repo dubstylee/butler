@@ -55,22 +55,36 @@ signal.signal(signal.SIGINT, control_c_handler)
 
 mqtt_client.on_connect = on_connect
 mqtt_client.on_disconnect = on_disconnect
-# mqtt_client.on_log = on_log
 
 
-class Queue:
-    def __init__(self):
+class Queue(object):
+    def __init__(self, size=0):
         self.items = []
+        self.size = size
+
+    def __repr__(self):
+        return "Queue (%d): %s" % (self.size, self.items)
+
+    def __setattr__(self, attr, value):
+        if attr == "size":
+            if getattr(self, "size", 0) != 0:
+                raise AttributeError("The size of a Queue can't be modified.")
+            if len(self.items) > value:
+                self.items = self.items[(len(self.items) - value):]
+        super(Queue, self).__setattr__(attr, value)
 
     def is_empty(self):
         return self.items == []
 
     def put(self, item):
+        if self.size != 0:
+            if len(self.items) >= self.size:
+                return "Queue is full."
         self.items.insert(0, item)
 
     def put_distinct(self, item):
         if item not in self.items:
-            self.items.insert(0, item)
+            self.put(item)
 
     def get(self):
         return self.items.pop()
