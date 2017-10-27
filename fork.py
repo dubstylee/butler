@@ -1,4 +1,5 @@
 import mraa
+import signal
 import time
 import sys
 from shared import exit_program, mqtt_client, mqtt_topic, send_message, ON, OFF
@@ -11,7 +12,6 @@ class Fork():
 
 
 fork = Fork()
-led = 0
 
 
 def on_message(client, userdata, msg):
@@ -29,6 +29,13 @@ def on_message(client, userdata, msg):
         if splits[4] == fork.name:
             send_message("FORKREPL %s" % fork.name)
             fork.in_use = False
+
+
+def control_c_handler(signum, frame):
+    mraa.Gpio(fork.led_no + 2).write(OFF)
+    exit_program()
+
+signal.signal(signal.SIGINT, control_c_handler)
 
 
 def main():
@@ -52,7 +59,7 @@ def main():
     send_message("FORK '%s' is in da house (on led %d)" % (fork.name,
                  fork.led_no))
 
-    led = mraa.Gpio(led_no + 2)
+    led = mraa.Gpio(fork.led_no + 2)
     led.dir(mraa.DIR_OUT)
     led.write(ON)
 
