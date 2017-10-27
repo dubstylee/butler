@@ -1,6 +1,7 @@
+import mraa
 import time
 import sys
-from shared import exit_program, mqtt_client, mqtt_topic, send_message
+from shared import exit_program, mqtt_client, mqtt_topic, send_message, ON, OFF
 
 
 class Fork():
@@ -10,6 +11,7 @@ class Fork():
 
 
 fork = Fork()
+led = 0
 
 
 def on_message(client, userdata, msg):
@@ -34,8 +36,8 @@ def main():
         print "Usage: fork <label>"
         exit_program()
 
-    led = int(ord(sys.argv[1].lower()) - ord('a'))
-    if led < 0 or led > 7:
+    led_no = int(ord(sys.argv[1].lower()) - ord('a'))
+    if led_no < 0 or led_no > 7:
         print "Usage: fork <label>\nlabel must be a letter between a and h"
         exit_program()
 
@@ -45,14 +47,24 @@ def main():
     mqtt_client.loop_start()
 
     fork.name = sys.argv[1]
-    fork.led_no = led
+    fork.led_no = led_no
 
     send_message("FORK '%s' is in da house (on led %d)" % (fork.name,
                  fork.led_no))
 
+    led = mraa.Gpio(led_no + 2)
+    led.dir(mraa.DIR_OUT)
+    led.write(ON)
+
     while True:
+        while fork.in_use:
+            led.write(OFF)
+            time.sleep(0.1)
+            led.write(ON)
+            time.sleep(0.1)
+
         # send_message("FORK %s stayin' alive" % fork.name)
-        time.sleep(5.0)
+        time.sleep(0.5)
 
 
 if __name__ == '__main__':
