@@ -96,6 +96,7 @@ def main():
       send_message("ARISE %d" %p.identifier)
       p.led.write(OFF)
       p.state = Status.ARISE
+      time.sleep(3)
       # Turn off LED when UP
     time.sleep(1)
 
