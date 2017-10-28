@@ -97,14 +97,12 @@ def main():
         time.sleep(0.25)
         iter = iter - 0.5
       p.led.write(ON)
-      time.sleep(randint(5, 10)) 
       send_message("REPLACE %c %d" %(forks[p.right],p.identifier))
       send_message("REPLACE %c %d" %(forks[p.left],p.identifier))
       send_message("ARISE %d" %p.identifier)
       p.led.write(OFF)
       p.state = Status.ARISE
-      time.sleep(3)
-      # Turn off LED when UP
+      time.sleep(2)
     time.sleep(1)
 
 if __name__ == "__main__": main()
