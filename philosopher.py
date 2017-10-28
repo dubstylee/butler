@@ -1,4 +1,5 @@
 import sys
+import mraa
 from enum import Enum
 from shared import *
 from random import *
@@ -7,7 +8,7 @@ class Status(Enum):
   ARISE     = 0
   SIT_DOWN  = 1
   HAS_LEFT  = 2
-  HAS_RIGTH = 3
+  HAS_RIGHT = 3
   EATING    = 5
 
 forks = {0 : 'a', 1 : 'b' , 2 : 'c', 3 : 'd', 4 : 'e'}
@@ -28,6 +29,11 @@ class Philosopher:
     print "Philosopher %d %s" %(self.identifier,self.state.value)
 p = Philosopher()
 
+def control_c_handler(signum, frame):
+  p.led.write(OFF)
+  exit_program()
+signal.signal(signal.SIGINT, control_c_handler)
+
 def on_message(client, userdata, msg):
   # Based on the message received the Philosopher
   # will go through state changes
@@ -35,20 +41,21 @@ def on_message(client, userdata, msg):
   # main. The received messages are mostly ACKs to
   # those messages
   message = msg.payload
+  #print("message %s \n" %message)
   split = message.split(' ')
-  if "GOSITDOWN" in split[2] and \
-    p.identifier == int(split[3]) and \
+  if "GOSITDOWN" in split[3] and \
+    p.identifier == int(split[4]) and \
     p.state == Status.ARISE :
     p.state = Status.SIT_DOWN
     p.led.write(ON)
-  elif "FORKAVAIL" in split[2] and \
-    forks[p.left] == split[3] and \
-    p.identifier == int(split[4]) and \
+  elif "FORKAVAIL" in split[3] and \
+    forks[p.left] == split[4] and \
+    p.identifier == int(split[5]) and \
     p.state == Status.SIT_DOWN :
     p.state = Status.HAS_LEFT
-  elif "FORKAVAIL" in split[2] and \
-    forks[p.right] == split[3] and \
-    p.identifier == int(split[4]) and \
+  elif "FORKAVAIL" in split[3] and \
+    forks[p.right] == split[4] and \
+    p.identifier == int(split[5]) and \
     p.state == Status.HAS_LEFT :
     p.state = Status.HAS_RIGHT
 
