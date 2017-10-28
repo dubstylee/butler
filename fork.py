@@ -16,17 +16,19 @@ fork = Fork()
 
 def on_message(client, userdata, msg):
     # we only listen for messages from
-    print msg.payload
+    # print msg.payload
     splits = msg.payload.split(' ')
     if splits[3] == "REQUEST":
         if splits[4] == fork.name:
             if fork.in_use:
                 send_message("FORKBUSY %s %d" % (fork.name, int(splits[5])))
             else:
+                print(msg.payload)
                 send_message("FORKAVAIL %s %d" % (fork.name, int(splits[5])))
                 fork.in_use = True
     elif splits[3] == "REPLACE":
         if splits[4] == fork.name:
+            print(msg.payload)
             send_message("FORKREPL %s" % fork.name)
             fork.in_use = False
 
