@@ -15,6 +15,7 @@ forks = {0 : 'a', 1 : 'b' , 2 : 'c', 3 : 'd', 4 : 'e'}
 class Philosopher:
   state = Status.ARISE
   identifier = 0
+  led = None
   left = 0
   right = 0
 
@@ -39,7 +40,7 @@ def on_message(client, userdata, msg):
     p.identifier == int(split[3]) and \
     p.state == Status.ARISE :
     p.state = Status.SIT_DOWN
-    # Turn on LED while DOWN
+    p.led.write(ON)
   elif "FORKAVAIL" in split[2] and \
     forks[p.left] == split[3] and \
     p.identifier == int(split[4]) and \
@@ -58,6 +59,9 @@ def main():
   else:
     p.identifier = int(sys.argv[1])
     p.updateForks()
+    p.led = mraa.Gpio(p.identifier+2)
+    p.led.dir(mraa.DIR_OUT)
+    p.led.write(OFF)
   mqtt_client.on_message = on_message
   mqtt_client.will_set(mqtt_topic, "Will of Philosopher %s\n\n", 0, False)
   mqtt_client.loop_start()  
@@ -77,10 +81,20 @@ def main():
     elif p.state == Status.HAS_RIGHT :
       p.state = Status.EATING
       # Blink while eating
+      delay = randint(5, 10)
+      iter = float(delay) / 0.5
+      while iter > 0 :
+        p.led.write(ON)
+        time.sleep(0.25)
+        p.led.write(OFF)
+        time.sleep(0.25)
+        iter = iter - 0.5
+      p.led.write(ON)
       time.sleep(randint(5, 10)) 
       send_message("REPLACE %c %d" %(forks[p.right],p.identifier))
       send_message("REPLACE %c %d" %(forks[p.left],p.identifier))
       send_message("ARISE %d" %p.identifier)
+      p.led.write(OFF)
       p.state = Status.ARISE
       # Turn off LED when UP
     time.sleep(1)
