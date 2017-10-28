@@ -1,8 +1,8 @@
 from shared import *
 
 COUNT = 4;
-
 tracker = [0, 0, 0, 0, 0]
+queue = Queue()
 
 def on_message(client, userdata, msg):
   global COUNT
@@ -12,15 +12,21 @@ def on_message(client, userdata, msg):
     identifier = int(split[4])
     if tracker[identifier] != 1 :
       send_message("GOSITDOWN %d" %identifier)
-      tracker[identifier] = 1;
+      tracker[identifier] = 1
       COUNT = COUNT - 1
   elif "SITDOWN" in split[3] and COUNT == 0:
       send_message("NOSITDOWN %d" %identifier)
+      queue.put_distinct(identifier)
   elif "ARISE" in split[3]:
     identifier = int(split[4])
     if tracker[identifier] == 1 :
       tracker[identifier] = 0
       COUNT = COUNT + 1
+      if (not queue.is_empty()) and COUNT > 0:
+        identifier = queue.get()
+        send_message("GOSITDOWN %d" %identifier)
+        tracker[identifier] = 1
+        COUNT = COUNT - 1 
 
 def main():
   mqtt_client.on_message = on_message
