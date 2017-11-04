@@ -13,7 +13,6 @@ Replace fork
 Response of fork
 [timestamp] [ip] FORKREPL <forkid>
 
-
 Philosopher Butler interaction
 
 Request sitdown
@@ -26,3 +25,7 @@ Response from Butler
 Convey arise
 /*For this the butler does not need to ack*/
 [timestamp] [ip] ARISE <philid>
+
+Convey eating
+/*For this the butler does not need to ack*/
+[timestamp] [ip] EATING <philid>

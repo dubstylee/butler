@@ -87,6 +87,7 @@ def main():
       send_message("REQUEST %c %d" %(forks[p.right],p.identifier))
     elif p.state == Status.HAS_RIGHT :
       p.state = Status.EATING
+      send_message("EATING %d" %p.identifier)
       # Blink while eating
       delay = randint(5, 10)
       iter = float(delay) / 0.5
