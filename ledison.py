@@ -34,13 +34,6 @@ class Circle:
         self.gui.update()
 
 
-class Fluent():
-    id = 0
-
-
-fluent = Fluent()
-
-
 class Ledison(tk.Frame):
     def draw_circle(self, c):
         return self.draw_circle_internal(c.x, c.y, c.r, fill=c.fill,
@@ -65,20 +58,20 @@ def on_message(client, userdata, msg):
     splits = msg.payload.split(' ')
 
     if splits[3] == "GOSITDOWN":
-        if int(splits[4]) == fluent.id:
-            leds[fluent.id].write(ON)
+        led = int(splits[4])
+        leds[led].write(ON)
     elif splits[3] == "ARISE":
-        if int(splits[4]) == fluent.id:
-            leds[fluent.id].write(OFF)
+        led = int(splits[4])
+        leds[led].write(OFF)
 
 
 def main():
-    if len(sys.argv) != 2:
-        print("Usage: fluent <led_no>")
-        exit_program()
+#    if len(sys.argv) != 2:
+#        print("Usage: fluent <led_no>")
+#        exit_program()
 
-    fluent.id = int(sys.argv[1])
-    mqtt_client.will_set(mqtt_topic, '___Will of FLUENT %d___' % fluent.id, 0,
+#    fluent.id = int(sys.argv[1])
+    mqtt_client.will_set(mqtt_topic, '___Will of FLUENTS___', 0,
                          False)
     mqtt_client.on_message = on_message
     mqtt_client.loop_start()
@@ -88,16 +81,18 @@ def main():
     for i in range(0, 8):
         c = Circle(gui, i, 40 + 40 * i, 40, 15, fill="#BBB", outline="white",
                    width=1)
-        if i in range(0, 4):
+        if i in range(0, 2):
             c.on_color = "green"
-        elif i in range(4, 7):
-            c.on_color = "yellow"
+        elif i in range(2, 4):
+            c.on_color = "blue"
+        elif i in range(4, 6):
+            c.on_color = "orange"
         else:
             c.on_color = "red"
         leds.append(c)
         c.write(OFF)
 
-    send_message("<LEDison> FLUENT %d is ready to rock" % fluent.id)
+    send_message("<LEDison> FLUENT is ready to rock")
     root.mainloop()
     exit_program()
 
