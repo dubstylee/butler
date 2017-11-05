@@ -42,13 +42,13 @@ def on_message(client, userdata, msg):
   identifier = int(split[4])
   if "SITDOWN" == action :
     philosopherStatus[identifier] = 1
+    send_message("UPDATEA %s" %message)
   elif "EATING" == action :
     checkAssert(identifier)
+    send_message("UPDATEA %s" %message)
   elif "ARISE" == action :
     philosopherStatus[identifier] = 0
-
-def manageLEDs():
-  print "Managing LEDs"
+    send_message("UPDATEA %s" %message)
 
 def main():
   mqtt_client.on_message = on_message
@@ -57,6 +57,7 @@ def main():
   while True:
     time.sleep(1)
     #Check assert status and control the LED accordingly
-    manageLEDs() 
+    if 0 in assertStatus
+      sendmessage("UPDATEA ASSERTFAILED")
 
 if __name__ == "__main__": main()  

@@ -13,13 +13,16 @@ class Gui(tk.Frame):
         self.property_frame = property_frame
 
     def part_a(self):
-        # uses assert_frame
         # part A Abhishek assert
         toAssert = "(!phil[i].eat W phil[i].arise)"
         label = tk.Label(self.assert_frame, text=toAssert)
-        label.pack()        
+        label.pack() 
         self.part_a_text = tk.Listbox(self.assert_frame, width=200)
         self.part_a_text.pack()
+        self.assert_label = tk.Label(self.assert_frame) 
+        self.assert_label.config(text = "Assert Successful", 
+                                 bg="green", width = 200)
+        self.assert_label.pack()
 
     def part_b(self):
         # part B Brian property
@@ -32,7 +35,10 @@ class Gui(tk.Frame):
 
     def update_part_a(self, text):
         self.part_a_text.insert(tk.END, text)
-
+        if "ASSERTFAILED" in text:
+          self.assert_label.config(text = "Assert Failed", 
+                                   bg="red", width = 200)
+                   
     def update_part_b(self, text):
         self.part_b_text.insert(tk.END, text)
 
@@ -65,7 +71,6 @@ def main():
 
     root.mainloop()
     exit_program()
-
 
 if __name__ == "__main__":
     main()
