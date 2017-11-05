@@ -1,7 +1,6 @@
 import Tkinter as tk
 from shared import mqtt_client, mqtt_topic, exit_program
 
-
 class Gui(tk.Frame):
     part_a_text = None
     part_b_text = None
@@ -16,7 +15,11 @@ class Gui(tk.Frame):
     def part_a(self):
         # uses assert_frame
         # part A Abhishek assert
-        print("Abhi assert")
+        toAssert = "(!phil[i].eat W phil[i].arise)"
+        label = tk.Label(self.assert_frame, text=toAssert)
+        label.pack()        
+        self.part_a_text = tk.Listbox(self.assert_frame, width=200)
+        self.part_a_text.pack()
 
     def part_b(self):
         # part B Brian property
@@ -33,18 +36,15 @@ class Gui(tk.Frame):
     def update_part_b(self, text):
         self.part_b_text.insert(tk.END, text)
 
-
 gui = None
-
 
 def on_message(client, userdata, msg):
     message = msg.payload
-    splits = message.split(' ', 5)
+    splits = message.split(' ', 4)
     if splits[3] == "UPDATEA":
         gui.update_part_a(splits[4])
     elif splits[3] == "UPDATEB":
         gui.update_part_b(splits[4])
-
 
 # placeholder for GUI
 def main():
@@ -62,8 +62,6 @@ def main():
 
     gui.part_a()
     gui.part_b()
-
-    gui.update_part_b("test text")
 
     root.mainloop()
     exit_program()
