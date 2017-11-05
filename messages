@@ -29,3 +29,10 @@ Convey arise
 Convey eating
 /*For this the butler does not need to ack*/
 [timestamp] [ip] EATING <philid>
+
+/*
+ * For the assert and property process to update
+ * the GUI
+ */
+[timestamp] [ip] UPDATEA <message as received>
+[timestamp] [ip] UPDATEB <message as received>
