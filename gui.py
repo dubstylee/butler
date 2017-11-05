@@ -5,6 +5,7 @@ from shared import mqtt_client, mqtt_topic, exit_program
 class Gui(tk.Frame):
     part_a_text = None
     part_b_text = None
+    property_state = "valid"
 
     def __init__(self, master, assert_frame, property_frame):
         tk.Frame.__init__(self, master)
@@ -47,7 +48,7 @@ class Gui(tk.Frame):
     def update_part_b(self, text):
         self.part_b_text.insert(tk.END, text)
         if text == "PROPERTY VIOLATION":
-            mqtt_client.loop_stop()
+            self.property_state = "invalid"
             self.property_status.config(text="Property Violation", bg="red")
 
 
@@ -59,7 +60,7 @@ def on_message(client, userdata, msg):
     splits = message.split(' ', 4)
     if splits[3] == "UPDATEA":
         gui.update_part_a(splits[4])
-    elif splits[3] == "UPDATEB":
+    elif splits[3] == "UPDATEB" and gui.property_state == "valid":
         gui.update_part_b(splits[4])
 
 
