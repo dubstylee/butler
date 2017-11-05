@@ -1,8 +1,11 @@
 import Tkinter as tk
-from shared import exit_program, mqtt_client, mqtt_topic
+from shared import mqtt_client, mqtt_topic, exit_program
 
 
 class Gui(tk.Frame):
+    part_a_text = None
+    part_b_text = None
+
     def __init__(self, master, assert_frame, property_frame):
         tk.Frame.__init__(self, master)
         master.title("Something Cool")
@@ -17,14 +20,35 @@ class Gui(tk.Frame):
 
     def part_b(self):
         # part B Brian property
-        label = tk.Label(self.property_frame, text="property description")
+        label = tk.Label(self.property_frame,
+                         text="property TESTING2 = "
+                         "(phil[0].sitdown -> phil[1].arise -> TESTING2).")
         label.pack()
-        text = tk.Text(self.property_frame, width=200)
-        text.pack()
+        self.part_b_text = tk.Text(self.property_frame, width=200)
+        self.part_b_text.pack()
+
+    def update_part_a(self, text):
+        self.part_a_text.insert(tk.END, text)
+
+    def update_part_b(self, text):
+        self.part_b_text.insert(tk.END, text)
+
+
+gui = None
+
+
+def on_message(client, userdata, msg):
+    message = msg.payload
+    splits = message.split(' ', 5)
+    if splits[3] == "UPDATEA":
+        gui.update_part_a(splits[4])
+    elif splits[3] == "UPDATEB":
+        gui.update_part_b(splits[4])
 
 
 # placeholder for GUI
 def main():
+    global gui
     root = tk.Tk()
     top_frame = tk.Frame()
     top_frame.pack()
@@ -32,10 +56,17 @@ def main():
     bottom_frame.pack(side=tk.BOTTOM)
     gui = Gui(root, top_frame, bottom_frame)
 
+    mqtt_client.will_set(mqtt_topic, '___Will of GUI___', 0, False)
+    mqtt_client.on_message = on_message
+    mqtt_client.loop_start()
+
     gui.part_a()
     gui.part_b()
 
+    gui.update_part_b("test text")
+
     root.mainloop()
+    exit_program()
 
 
 if __name__ == "__main__":
