@@ -1,6 +1,7 @@
 import Tkinter as tk
 from shared import mqtt_client, mqtt_topic, exit_program
 
+
 class Gui(tk.Frame):
     part_a_text = None
     part_b_text = None
@@ -16,12 +17,12 @@ class Gui(tk.Frame):
         # part A Abhishek assert
         toAssert = "(!phil[i].eat W phil[i].arise)"
         label = tk.Label(self.assert_frame, text=toAssert)
-        label.pack() 
+        label.pack()
         self.part_a_text = tk.Listbox(self.assert_frame, width=200)
         self.part_a_text.pack()
-        self.assert_label = tk.Label(self.assert_frame) 
-        self.assert_label.config(text = "Assert Successful", 
-                                 bg="green", width = 200)
+        self.assert_label = tk.Label(self.assert_frame)
+        self.assert_label.config(text="Assert Successful",
+                                 bg="green", width=200)
         self.assert_label.pack()
 
     def part_b(self):
@@ -30,19 +31,28 @@ class Gui(tk.Frame):
                          text="property TESTING2 = "
                          "(phil[0].sitdown -> phil[1].arise -> TESTING2).")
         label.pack()
-        self.part_b_text = tk.Text(self.property_frame, width=200)
+        self.part_b_text = tk.Listbox(self.property_frame, width=200)
         self.part_b_text.pack()
+        self.property_status = tk.Label(self.property_frame, width=200,
+                                        text="Safety Property Valid",
+                                        bg="green")
+        self.property_status.pack()
 
     def update_part_a(self, text):
         self.part_a_text.insert(tk.END, text)
         if "ASSERTFAILED" in text:
-          self.assert_label.config(text = "Assert Failed", 
-                                   bg="red", width = 200)
-                   
+            self.assert_label.config(text="Assert Failed",
+                                     bg="red", width=200)
+
     def update_part_b(self, text):
         self.part_b_text.insert(tk.END, text)
+        if text == "PROPERTY VIOLATION":
+            mqtt_client.loop_stop()
+            self.property_status.config(text="Property Violation", bg="red")
+
 
 gui = None
+
 
 def on_message(client, userdata, msg):
     message = msg.payload
@@ -52,13 +62,16 @@ def on_message(client, userdata, msg):
     elif splits[3] == "UPDATEB":
         gui.update_part_b(splits[4])
 
+
 # placeholder for GUI
 def main():
     global gui
     root = tk.Tk()
     top_frame = tk.Frame()
     top_frame.pack()
-    bottom_frame = tk.Frame()
+    bottom_frame = tk.Frame(highlightthickness=2,
+                            highlightbackground="black",
+                            highlightcolor="black")
     bottom_frame.pack(side=tk.BOTTOM)
     gui = Gui(root, top_frame, bottom_frame)
 
@@ -71,6 +84,7 @@ def main():
 
     root.mainloop()
     exit_program()
+
 
 if __name__ == "__main__":
     main()

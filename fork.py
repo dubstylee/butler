@@ -37,6 +37,7 @@ def control_c_handler(signum, frame):
     mraa.Gpio(fork.led_no + 2).write(OFF)
     exit_program()
 
+
 signal.signal(signal.SIGINT, control_c_handler)
 
 
