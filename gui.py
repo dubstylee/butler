@@ -4,6 +4,7 @@ from shared import mqtt_client, mqtt_topic, exit_program
 
 class Gui(tk.Frame):
     part_a_text = None
+    part_b_label = None
     part_b_text = None
     property_state = "valid"
 
@@ -28,10 +29,9 @@ class Gui(tk.Frame):
 
     def part_b(self):
         # part B Brian property
-        label = tk.Label(self.property_frame,
-                         text="property TESTING2 = "
-                         "(phil[0].sitdown -> phil[1].arise -> TESTING2).")
-        label.pack()
+        self.part_b_label = tk.Label(self.property_frame,
+                                     text="")
+        self.part_b_label.pack()
         self.part_b_text = tk.Listbox(self.property_frame, width=200)
         self.part_b_text.pack()
         self.property_status = tk.Label(self.property_frame, width=200,
@@ -45,9 +45,12 @@ class Gui(tk.Frame):
             self.assert_label.config(text="Assert Failed",
                                      bg="red", width=200)
 
+    def update_label_b(self, text):
+        self.part_b_label.config(text=text)
+
     def update_part_b(self, text):
         self.part_b_text.insert(tk.END, text)
-        if text == "PROPERTY VIOLATION":
+        if "VIOLATION OF PROPERTY" in text:
             self.property_state = "invalid"
             self.property_status.config(text="Property Violation", bg="red")
 
@@ -60,6 +63,8 @@ def on_message(client, userdata, msg):
     splits = message.split(' ', 4)
     if splits[3] == "UPDATEA":
         gui.update_part_a(splits[4])
+    elif splits[3] == "LABELB":
+        gui.update_label_b(splits[4])
     elif splits[3] == "UPDATEB" and gui.property_state == "valid":
         gui.update_part_b(splits[4])
 
