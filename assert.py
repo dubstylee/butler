@@ -35,11 +35,11 @@ def on_message(client, userdata, msg):
   action = split[3]
   identifier = int(split[4])
   if "EATING" == action :
-    if assertStatus[identifier] == Status.BEGIN
+    if assertStatus[identifier] == Status.BEGIN:
       assertStatus[identifier] = Status.ERROR
     send_message("UPDATEA %s" %message)
   elif "ARISE" == action :
-    if assertStatus[identifier] == Status.BEGIN
+    if assertStatus[identifier] == Status.BEGIN:
       status = Status.HOMEFREE
     send_message("UPDATEA %s" %message)
 
@@ -50,7 +50,7 @@ def main():
   while True:
     time.sleep(1)
     #Check assert status and control the LED accordingly
-    if Status.ERROR in assertStatus
+    if Status.ERROR in assertStatus:
       sendmessage("UPDATEA ASSERTFAILED")
 
 if __name__ == "__main__": main()  
