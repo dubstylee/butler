@@ -1,0 +1,7 @@
+systemctl stop sendipaddr.service
+python butler.py &
+python philosopher.py 0 &
+python philosopher.py 1 &
+python philosopher.py 2 &
+python philosopher.py 3 &
+python philosopher.py 4 &

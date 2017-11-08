@@ -4,6 +4,13 @@ import time
 
 properties = {"TESTING2": [["GOSITDOWN 0", "phil[0].sitdown"],
                            ["ARISE 1", "phil[1].arise"]]}
+'''
+properties = {"TESTING2": [["GOSITDOWN 0", "phil[0].sitdown"],
+                           ["ARISE 1", "phil[1].arise"]],
+              "EXTRA": [["GOSITDOWN 0", "phil[0].sitdown"],
+                        ["ARISE 1", "phil[1].arise"],
+                        ["GOSITDOWN 0", "phil[0].sitdown"]]}
+'''
 
 
 class Prop():
@@ -14,8 +21,12 @@ class Prop():
 
     def __repr__(self):
         text = "property %s = (" % self.name
-        for action in self.alphabet:
-            text = text + "%s ->" % action[1]
+        for i in range(0, len(self.alphabet)):
+            action = self.alphabet[i]
+            if i == self.status:
+                text = text + "[%s] -> " % action[1].upper()
+            else:
+                text = text + "%s -> " % action[1]
         text = text + "%s)" % self.name
         return text
 
@@ -35,6 +46,7 @@ signal.signal(signal.SIGINT, control_c_handler)
 
 def on_message(client, userdata, msg):
     splits = msg.payload.split(' ', 3)
+
     for p in property_list:
         found = False
         actions = p.alphabet
@@ -44,12 +56,25 @@ def on_message(client, userdata, msg):
                 break
 
         if found:
-            send_message("UPDATEB %s %s: %s" %
-                         (splits[0], splits[1], splits[3]))
+            send_message("UPDATEB %s %s %s: %s" %
+                         (splits[0], splits[1], p.name, splits[3]))
             if actions[p.status][0] == splits[3]:
                 p.status = (p.status + 1) % len(p.alphabet)
             else:
                 send_message("UPDATEB VIOLATION OF PROPERTY %s" % p.name)
+
+    update_properties()
+
+
+def update_properties():
+    label_str = ""
+
+    for i in range(0, len(property_list)):
+        if i != 0:
+            label_str = label_str + "\n"
+        label_str = label_str + ("%s" % property_list[i])
+
+    send_message("LABELB %s" % label_str)
 
 
 def main():
@@ -57,8 +82,7 @@ def main():
     mqtt_client.on_message = on_message
     mqtt_client.loop_start()
 
-    for p in property_list:
-        send_message("LABELB %s" % p)
+    update_properties()
 
     while True:
         time.sleep(1.0)
