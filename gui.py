@@ -41,6 +41,8 @@ class Gui(tk.Frame):
 
     def update_part_a(self, text):
         self.part_a_text.insert(tk.END, text)
+        self.part_a_text.yview(tk.END)
+
         if "ASSERTFAILED" in text:
             self.assert_label.config(text="Assert Failed",
                                      bg="red", width=200)
@@ -50,6 +52,8 @@ class Gui(tk.Frame):
 
     def update_part_b(self, text):
         self.part_b_text.insert(tk.END, text)
+        self.part_b_text.yview(tk.END)
+
         if "VIOLATION OF PROPERTY" in text:
             self.property_state = "invalid"
             self.property_status.config(text="Property Violation", bg="red")
