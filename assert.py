@@ -30,7 +30,6 @@ ariseIdentifier = 0
 def on_message(client, userdata, msg):
   global assertStatus
   message = msg.payload
-  print message
   if (not ("EATING" in message or "ARISE" in message)) or ("UPDATEA" in message):
     return
   split = message.split(' ')
@@ -63,6 +62,7 @@ def main():
   mqtt_client.on_message = on_message
   mqtt_client.will_set(mqtt_topic, "Will of Validator %s\n\n", 0, False)
   mqtt_client.loop_start() 
+  send_message("LABELA (!phil[%d].eat W phil[%d].arise)" %(eatIdentifier, ariseIdentifier))
   while True:
     time.sleep(1) 
 

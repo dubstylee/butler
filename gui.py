@@ -1,12 +1,13 @@
 import Tkinter as tk
 from shared import mqtt_client, mqtt_topic, exit_program
 
-
 class Gui(tk.Frame):
+    part_a_label = None
     part_a_text = None
     part_b_label = None
     part_b_text = None
     property_state = "valid"
+    assert_state = "valid"    
 
     def __init__(self, master, assert_frame, property_frame):
         tk.Frame.__init__(self, master)
@@ -17,9 +18,8 @@ class Gui(tk.Frame):
 
     def part_a(self):
         # part A Abhishek assert
-        toAssert = "(!phil[i].eat W phil[i].arise)"
-        label = tk.Label(self.assert_frame, text=toAssert)
-        label.pack()
+        self.part_a_label = tk.Label(self.assert_frame, text="")
+        self.part_a_label.pack()
         self.part_a_text = tk.Listbox(self.assert_frame, width=200)
         self.part_a_text.pack()
         self.assert_label = tk.Label(self.assert_frame)
@@ -39,13 +39,16 @@ class Gui(tk.Frame):
                                         bg="green")
         self.property_status.pack()
 
+    def update_label_a(self, text):
+        self.part_a_label.config(text=text)
+
     def update_part_a(self, text):
         self.part_a_text.insert(tk.END, text)
         self.part_a_text.yview(tk.END)
 
         if "ASSERTFAILED" in text:
-            self.assert_label.config(text="Assert Failed",
-                                     bg="red", width=200)
+            self.assert_state = "invalid"
+            self.assert_label.config(text="Assert Failed", bg="red", width=200)
 
     def update_label_b(self, text):
         self.part_b_label.config(text=text)
@@ -58,20 +61,19 @@ class Gui(tk.Frame):
             self.property_state = "invalid"
             self.property_status.config(text="Property Violation", bg="red")
 
-
 gui = None
-
 
 def on_message(client, userdata, msg):
     message = msg.payload
     splits = message.split(' ', 4)
-    if splits[3] == "UPDATEA":
+    if splits[3] == "LABELA":
+        gui.update_label_a(splits[4]) 
+    elif splits[3] == "UPDATEA" and gui.assert_state == "valid":
         gui.update_part_a(splits[4])
     elif splits[3] == "LABELB":
         gui.update_label_b(splits[4])
     elif splits[3] == "UPDATEB" and gui.property_state == "valid":
         gui.update_part_b(splits[4])
-
 
 # placeholder for GUI
 def main():
@@ -94,7 +96,6 @@ def main():
 
     root.mainloop()
     exit_program()
-
 
 if __name__ == "__main__":
     main()
