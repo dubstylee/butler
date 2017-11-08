@@ -12,3 +12,12 @@ https://www.dropbox.com/s/dbfhnjb7ovx815o/butler.mov?dl=0
 <p>Each philosopher wants to sit at the table to eat. When they get permission from the butler, they will sit down and try to acquire the left fork followed by the right fork. If the left fork is not available, they will keep trying until the fork becomes available, then try for the right fork. Once a philosopher has acquired both forks, they will eat for a random interval, then replace forks and stand up. The LED for a philosopher will be solid once he has sat down, and will be flashing once the philosopher has both forks and is eating. Once the forks are replaced, the LED will be solid once again, and turn off once the philosopher leaves the table.</p>
 <b>Fork</b></br>
 <p>The fork is a simple process that keeps track of whether it is in use or available. While the fork is available, the LED will turn on. If a philosopher requests the fork when it is not in use, it will respond to the philosopher that it is available, then it will begin flashing to indicate it is in use. If the fork is already in use, it will respond accordingly to the requesting philosopher and the philosopher will keep requesting the fork until it becomes available.</p>
+
+<hr>
+
+<b>Property</b>
+<p>The property monitor runs in conjunction with the above butler system to watch for safety violations as specified by the properties. Only actions that are part of a property will be logged, and if a property violation is detected, a message will be sent out. The GUI process will display the status of the property monitor. If a property violation is detected, that property will stop listening to messages.</p>
+<b>Assert</b>
+<p>Assert does stuff. The GUI process will display the status of the asserts.</p>
+<b>GUI</b>
+<p>The GUI process just listens for messages from the property and assert monitors. The status of the others processes is displayed in the GUI. If a property violation is detected, the status label will turn red to indicate the violation.</p>
