@@ -9,7 +9,7 @@
 #  be true when a philosopher never eats, or if they eat, 
 #  they only can if they are standing up. 
 ############################################################
-
+from enum import Enum
 from shared import *
 
 #  These arrays gives a way to maintain an assert per
@@ -24,6 +24,7 @@ class Status(Enum) :
 #  Since we have a weak until in the property, we have
 #  a valid BEGIN state where the assert passes for all
 #  philosophers
+system = Status.HOMEFREE
 assertStatus = [Status.BEGIN, Status.BEGIN, 
                 Status.BEGIN, Status.BEGIN, 
                 Status.BEGIN]
@@ -32,25 +33,28 @@ def on_message(client, userdata, msg):
   global COUNT
   message = msg.payload
   split = message.split(' ')
-  action = split[3]
-  identifier = int(split[4])
+  action = split[3] 
   if "EATING" == action :
+    identifier = int(split[4])
     if assertStatus[identifier] == Status.BEGIN:
       assertStatus[identifier] = Status.ERROR
     send_message("UPDATEA %s" %message)
   elif "ARISE" == action :
+    identifier = int(split[4])
     if assertStatus[identifier] == Status.BEGIN:
-      status = Status.HOMEFREE
+      assertStatus[identifier] = Status.HOMEFREE
     send_message("UPDATEA %s" %message)
 
 def main():
+  global system
   mqtt_client.on_message = on_message
   mqtt_client.will_set(mqtt_topic, "Will of Validator %s\n\n", 0, False)
   mqtt_client.loop_start()  
   while True:
     time.sleep(1)
     #Check assert status and control the LED accordingly
-    if Status.ERROR in assertStatus:
-      sendmessage("UPDATEA ASSERTFAILED")
+    if Status.ERROR in assertStatus and system == Status.HOMEFREE :
+      system = Status.ERROR
+      send_message("UPDATEA ASSERTFAILED")
 
 if __name__ == "__main__": main()  
