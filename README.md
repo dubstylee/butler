@@ -18,6 +18,6 @@ https://www.dropbox.com/s/dbfhnjb7ovx815o/butler.mov?dl=0
 <b>Property</b>
 <p>The property monitor runs in conjunction with the above butler system to watch for safety violations as specified by the properties. Only actions that are part of a property will be logged, and if a property violation is detected, a message will be sent out. The GUI process will display the status of the property monitor. If a property violation is detected, that property will stop listening to messages.</p>
 <b>Assert</b>
-<p>Assert does stuff. The GUI process will display the status of the asserts.</p>
+<p>The assert process gives the user to assert and check some conditions during the execution of the dining philosopher system. The current assert process is made to assert the case `!phil[i].eat W phil[j].arise` where i and j can be passed in from the command line to the process to make the desired assert. Only EAT and ARISE actions are tracked by the current assert process. If the assert process notices the assert has failed, it reports the failure to the GUI process at which point the GUI no more listens to messages from the assert process</p>
 <b>GUI</b>
 <p>The GUI process just listens for messages from the property and assert monitors. The status of the others processes is displayed in the GUI. If a property violation is detected, the status label will turn red to indicate the violation.</p>
